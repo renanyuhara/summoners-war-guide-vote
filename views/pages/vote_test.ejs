@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Summoners War Guide Vote</title>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <script src="/js/jquery-3.2.1.min.js"></script>
+        <script src="/js/umd/popper.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        
+        <% include ../partials/header %>
+        <h1>What a lovely day</h1>
+        <div class="alert alert-primary" role="alert" id="msg">
+            <%=message%>
+        </div>
+
+        <input type="text" id="monster_name" value="Clara"/>
+
+        <button type="button" class="btn btn-success" id="btnUpvote" >Up</button>
+        <button type="button" class="btn btn-danger" id="btnDownvote">Down</button>
+
+        <script type="text/javascript">
+            
+            function sendVote(chosenOption) {
+                var objectToSend = {
+                    option: chosenOption,
+                    monster_name: $('#monster_name').val(),
+                    id_vote : 1
+                };
+
+                $.ajax({
+                    dataType:'json',
+                    type:'POST',
+                    url: '/api/vote',
+                    data: objectToSend,
+                    cache: false,
+                    success: function(data) {
+                        $('#msg').html(data.success);
+                    },
+                    error: function(a,b,c) {
+                        console.log(a);
+                        console.log(b);
+                        console.log(c);
+                    }
+                });
+            }
+            $('#btnUpvote').click(function(e) {
+                e.preventDefault();
+                sendVote(true);
+            });
+            $('#btnDownvote').click(function(e) {
+                e.preventDefault();
+                sendVote(false);
+            });
+        </script>
+        <% include ../partials/footer %>
+    </body>
+</html>

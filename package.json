@@ -1,0 +1,17 @@
+{
+  "name": "summoners-war-guide-vote",
+  "version": "1.0.0",
+  "description": "Summoners War Guide Vote",
+  "main": "index.js",
+  "author": {
+    "name": "Renan Takeshi Laffin Yuhara"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "ejs": "^2.5.7",
+    "express": "^4.15.4",
+    "express-session": "^1.15.5",
+    "mysql": "^2.14.1"
+  }
+}
