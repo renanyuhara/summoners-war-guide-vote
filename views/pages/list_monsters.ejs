@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Summoners War Guide Vote</title>
+        <link rel="stylesheet" href="/css/application.css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/font_awesome/css/font-awesome.min.css">
+        <script src="/js/jquery-3.2.1.min.js"></script>
+        <script src="/js/umd/popper.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        
+    </head>
+    <body>
+        
+        <% include ../partials/header %>
+        <h1>What a lovely day</h1>
+        <div class="alert alert-primary teste-de-fonte" role="alert" id="msg">
+            u
+        </div>
+        <table id="content_table" border="1">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+
+        <script type="text/javascript">
+
+            var listOfColumns = [];
+            
+            function montarCorpoTabela() {
+                console.log('Iniciar montagem de corpo de tabela');
+                $.ajax({
+                    type:'get',
+                    url: '/api/monster',
+                    cache:false,
+                    success: function(data) {
+                        
+                        if (data.success) {
+                            $('#content_table > tbody').empty();
+                            var monsterIdAnt = -1;
+                            for (var i in data.monster) {
+                                
+                                var monster = data.monster[i];
+                                if (monster.id_monster != monsterIdAnt) {
+                                    
+                                    var trLalala = $('<tr>');
+                                    var tdFamilyName = $('<td>');
+                                    tdFamilyName.attr('id','td_monster_family_' + monster.id_monster);
+                                    var tdAwakenName = $('<td>');
+                                    tdAwakenName.attr('id', 'td_monster_awaken_' + monster.id_monster);
+                                    trLalala.append(tdFamilyName);
+                                    trLalala.append(tdAwakenName);
+
+                                    for (var j in listOfColumns) {
+                                        var tdLalala = $('<td>');
+                                        tdLalala.attr('id', 'td_monster_' + monster.id_monster + '_' + listOfColumns[j]);
+                                        trLalala.append(tdLalala);
+                                    }
+
+                                    $('#content_table > tbody').append(trLalala);
+                                    
+                                    monsterIdAnt = monster.id_monster;
+                                }
+
+                                var tdmaluca = $('#td_monster_' + monster.id_monster + '_' + monster.id_vote_column);
+
+                                if (monster.number_of_votes > 0) {
+                                    tdmaluca.html('<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>');
+                                } else if (monster.number_of_votes < 0) {
+                                    tdmaluca.html('<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>');
+                                } else {
+                                    tdmaluca.html('<i class="fa fa-balance-scale" aria-hidden="true"></i>');
+                                }
+                                //tdmaluca.html(monster.number_of_votes);
+
+                                var tdDoNome = $('#td_monster_family_' + monster.id_monster);
+                                tdDoNome.html(monster.family_name);
+
+                                var tdDoAwaken = $('#td_monster_awaken_' + monster.id_monster);
+                                tdDoAwaken.html(monster.awakened_name);
+                            }
+                            console.log($('#content_table'));
+                        } else {
+                            $('#msg').html('Deu zica!');
+                        }
+                    },
+                    error: function(a,b,c) {
+                        $('#msg').html('Montar Coluna Error');
+                        console.log(a);
+                        console.log(b);
+                        console.log(c);
+                    }
+                });
+            }
+            function montarColunas() {
+                $.ajax({
+                    type:'get',
+                    url: '/api/report_columns',
+                    cache:false,
+                    success: function(data) {
+                        if (data.success) {
+                            $('#content_table > thead').empty();
+                            var thBase = $('<tr>');
+                            for (var i in data.columns) {
+                                var column = data.columns[i];
+                                var tdBase = $('<td>').html(column.short_description);
+                                //tdBase.id= 'td_maravilha_' + column.id_vote_column;
+                                //tdBase.setAttribute("id", 'td_maravilha_' + column.id_vote_column);
+                                //tdBase.attr('id', 'td_maravilha_' + column.id_vote_column);
+                                if (column.points > 0) {
+                                    listOfColumns.push(column.id_vote_column);
+                                }
+                                thBase.append(tdBase);
+                            }
+                            $('#content_table > thead').append(thBase);
+
+                            montarCorpoTabela();
+                        } else {
+                            $('#msg').html('Deu zica!');
+                        }
+                    },
+                    error: function(a,b,c) {
+                        $('#msg').html('Deu ruim!');
+                        console.log(a);
+                        console.log(b);
+                        console.log(c);
+                    }
+                });
+            }
+            $(document).ready(function() {
+                montarColunas();
+            });
+            
+            function sendVote(chosenOption) {
+                var objectToSend = {
+                    option: chosenOption,
+                    monster_name: $('#monster_name').val(),
+                    id_vote : 1
+                };
+
+                $.ajax({
+                    dataType:'json',
+                    type:'POST',
+                    url: '/api/vote',
+                    data: objectToSend,
+                    cache: false,
+                    success: function(data) {
+                        $('#msg').html(data.success);
+                    },
+                    error: function(a,b,c) {
+                        console.log(a);
+                        console.log(b);
+                        console.log(c);
+                    }
+                });
+            }
+            $('#btnUpvote').click(function(e) {
+                e.preventDefault();
+                sendVote(true);
+            });
+            $('#btnDownvote').click(function(e) {
+                e.preventDefault();
+                sendVote(false);
+            });
+        </script>
+        <% include ../partials/footer %>
+    </body>
+</html>
