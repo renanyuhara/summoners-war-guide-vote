@@ -311,7 +311,7 @@ module.exports = function(app, connection) {
         });
     });
 
-    app.post('/api/start_database', function(req,res) {
+    app.get('/api/start_database', function(req,res) {
         startDatabase(function() {
             var result = {
                 'message' : 'OK'
@@ -330,6 +330,11 @@ module.exports = function(app, connection) {
         });
     });
 
+
+    app.get('/progression', function(req,res) {
+        res.render('pages/progression', {'message': 'ok'});
+    });
+
     app.get('/api/report_columns', function(req,res) {
         getReportColumns(function(resultado) {
             var result = {
@@ -339,4 +344,5 @@ module.exports = function(app, connection) {
             res.json(result);
         });
     });
+    
 }

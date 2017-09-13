@@ -1,0 +1,35 @@
+.step {
+    width: 80%;
+}
+.step img
+{
+    width: 100px;
+    height: 100px;
+}
+
+.step div{
+    margin-top: 20px;
+}
+
+.step-left {
+    margin-left: 50px;
+    float: left;
+}
+.step-left img { 
+    float: left;
+}
+
+.step-right {
+    margin-right: 50px;
+    float: right;
+}
+.step-right img { 
+    float: right;
+}
+
+.divEarlyGame
+{
+    background-color: orange;
+    float: left;
+    width: 100%;
+}
