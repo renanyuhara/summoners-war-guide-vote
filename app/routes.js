@@ -160,6 +160,7 @@ module.exports = function(app, connection) {
             " ,family_name " +
             " ,awakened_name " +
             " ,element " +
+            " ,id_vote_column " +
             " ,vote_column_description " +
             " ,COALESCE(number_of_votes,0) as number_of_votes " +
             " from vote_results " +
@@ -183,12 +184,49 @@ module.exports = function(app, connection) {
                             monster.element = rows[i][j].element;
                             monster.vote_column_description = rows[i][j].vote_column_description;
                             monster.number_of_votes = rows[i][j].number_of_votes;
+                            monster.id_vote_column = rows[i][j].id_vote_column;
                             //console.log(rows[i][j]);
                             //console.log(monster);
                             retorno.push(monster);
                         }
 
                     }
+                }
+            }
+
+            callbackFunc(retorno);
+        });
+    }
+
+    function getReportColumns(callbackFunc) {
+        var sql = "";
+            sql += " select 0 as id_vote_column ";
+            sql += " ,'Family Name' as short_description ";
+            sql += " ,'Family Name' as full_description ";
+            sql += " ,0 as points ";
+            sql += " union all ";
+            sql += " select 0 as id_vote_column ";
+            sql += " ,'Awakened Name' as short_description ";
+            sql += " , 'Awakened Name' as full_description ";
+            sql += " ,0 as points "; 
+            sql += " union all ";
+            sql += " select id as id_vote_column ";
+            sql += " ,short_description ";
+            sql += " , full_description ";
+            sql += " , points ";
+            sql += " from vote_column; ";
+        
+        connection.query(sql, function(err, rows, fields) {
+            if (err) throw err;
+            var retorno = [];
+            if (rows.length > 0) {
+                for (var i in rows) {
+                    var column = new Object();
+                    column.id_vote_column = rows[i].id_vote_column;
+                    column.short_description = rows[i].short_description;
+                    column.full_description = rows[i].full_description;
+                    column.points = rows[i].points;
+                    retorno.push(column);
                 }
             }
 
@@ -205,6 +243,14 @@ module.exports = function(app, connection) {
         selectAllUsers(function() {
             res.render('index', { 'message': "That's all folks!"});
         }, null);
+    });
+
+    app.get('/vote_test', function(req,res) {
+        res.render('pages/vote_test', {'message': 'ok'});
+    });
+
+    app.get('/columns_test', function(req,res) {
+        res.render('pages/list_monsters');
     });
 
     app.post('/api/monster', function(req,res) {
@@ -238,10 +284,6 @@ module.exports = function(app, connection) {
             }
             res.render('index', {'message': 'That\'s all folks!'});
         });
-    });
-
-    app.get('/vote_test', function(req,res) {
-        res.render('pages/vote_test', {'message': 'ok'});
     });
 
     app.post('/api/vote', function(req,res) {
@@ -288,7 +330,19 @@ module.exports = function(app, connection) {
         });
     });
 
+
     app.get('/progression', function(req,res) {
         res.render('pages/progression', {'message': 'ok'});
     });
+
+    app.get('/api/report_columns', function(req,res) {
+        getReportColumns(function(resultado) {
+            var result = {
+                success : (resultado.length > 0),
+                columns : resultado
+            };
+            res.json(result);
+        });
+    });
+    
 }
