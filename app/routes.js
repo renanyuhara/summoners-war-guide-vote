@@ -287,4 +287,8 @@ module.exports = function(app, connection) {
             res.json(result);
         });
     });
+
+    app.get('/progression', function(req,res) {
+        res.render('pages/progression', {'message': 'ok'});
+    });
 }
